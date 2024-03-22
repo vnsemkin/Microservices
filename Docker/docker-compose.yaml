@@ -1,0 +1,87 @@
+version: '3.8'
+services:
+  database:
+    container_name: database
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB:       "ostock_dev"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/1-init.sql
+      - ./data.sql:/docker-entrypoint-initdb.d/2-data.sql
+    networks:
+      backend:
+        aliases:
+          - "database"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  config-server:
+    container_name: config-server
+    build: ../ConfigurationServer/
+    ports:
+      - "8071:8071"
+    networks:
+      backend:
+        aliases:
+          - "config-server"
+  eureka-server:
+    container_name: eureka-server
+    build: ../EurekaServer/
+    environment:
+      PROFILE: "dev"
+      CONFIG_SERVER_URL: "http://config-server"
+      CONFIG_SERVER_PORT: "8071"
+    ports:
+      - "8070:8070"
+    depends_on:
+      database:
+        condition: service_healthy
+      config-server:
+        condition: service_started
+    networks:
+      backend:
+        aliases:
+          - "eureka-server"
+  license-service:
+    container_name: licensing-service
+    build: ../LicenseService/
+    environment:
+      PROFILE: "dev"
+      CONFIG_SERVER_URL: "http://config-server"
+      CONFIG_SERVER_PORT:   "8071"
+      DATABASE_SERVER_PORT: "5432"
+    depends_on:
+      database:
+        condition: service_healthy
+      config-server:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+  organization-service:
+    container_name: organization-service
+    build: ../OrganizationService/
+    environment:
+      PROFILE: "dev"
+      CONFIG_SERVER_URL: "http://config-server"
+      CONFIG_SERVER_PORT: "8071"
+      DATABASE_SERVER_PORT: "5432"
+    depends_on:
+      database:
+        condition: service_healthy
+      config-server:
+        condition: service_started
+    ports:
+      - "8081:8081"
+    networks:
+      - backend
+networks:
+  backend:
+    driver: bridge
