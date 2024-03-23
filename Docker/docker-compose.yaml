@@ -48,6 +48,23 @@ services:
       backend:
         aliases:
           - "eureka-server"
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    restart: no
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    volumes:
+      - keycloak_data:/opt/jboss/keycloak/standalone/data
+      - keycloak_config:/opt/jboss/keycloak/standalone/configuration
+    command: start-dev
+    ports:
+      - "8080:8080"
+    networks:
+      backend:
+        aliases:
+          - "keycloak"
   license-service:
     container_name: licensing-service
     build: ../LicenseService/
@@ -62,7 +79,7 @@ services:
       config-server:
         condition: service_started
     ports:
-      - "8080:8080"
+      - "8082:8082"
     networks:
       - backend
   organization-service:
@@ -82,6 +99,9 @@ services:
       - "8081:8081"
     networks:
       - backend
+volumes:
+  keycloak_data:
+  keycloak_config:
 networks:
   backend:
     driver: bridge

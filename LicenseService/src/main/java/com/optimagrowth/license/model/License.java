@@ -1,5 +1,6 @@
 package com.optimagrowth.license.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,6 +20,7 @@ import lombok.ToString;
 public class License {
     @Id
     @Column(name = "license_id", nullable = false)
+    @JsonIgnore
     private String licenseId;
     private String description;
     @Column(name = "organization_id", nullable = false)

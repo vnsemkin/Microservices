@@ -5,7 +5,8 @@ spring:
     active: dev
   config:
     import: "optional:configserver:${CONFIG_SERVER_URL}:${CONFIG_SERVER_PORT}"
-
+server:
+  port: 8082
 resilience4j.circuitbreaker:
   instances:
     licenseService:

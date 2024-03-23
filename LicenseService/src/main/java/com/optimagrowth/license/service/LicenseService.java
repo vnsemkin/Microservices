@@ -1,24 +1,22 @@
 package com.optimagrowth.license.service;
 
+import com.optimagrowth.license.configuration.ServiceConfig;
+import com.optimagrowth.license.exception.LicenseNotFoundException;
+import com.optimagrowth.license.model.License;
+import com.optimagrowth.license.model.Organization;
+import com.optimagrowth.license.repository.LicenseRepository;
+import com.optimagrowth.license.service.client.OrganizationServiceClient;
+import com.optimagrowth.license.service.utils.UserContextHolder;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
-
-import com.optimagrowth.license.configuration.ServiceConfig;
-import com.optimagrowth.license.exception.LicenseNotFoundException;
-import com.optimagrowth.license.model.Organization;
-import com.optimagrowth.license.service.client.OrganizationServiceClient;
-import com.optimagrowth.license.service.utils.UserContextHolder;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
-import io.github.resilience4j.retry.annotation.Retry;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.stereotype.Service;
-import com.optimagrowth.license.model.License;
-import com.optimagrowth.license.repository.LicenseRepository;
 
 @Slf4j
 @Service
@@ -43,9 +41,7 @@ public class LicenseService {
     public License getLicense(String licenseId, String organizationId) {
         License license = licenseRepository.findByOrganizationIdAndLicenseId(organizationId, licenseId);
         if (license == null) {
-            throw new IllegalArgumentException(String.format(messageSource
-                    .getMessage("license.search.error.message", null, null)
-                , licenseId, organizationId));
+            throw new LicenseNotFoundException(String.format("License with id %s not found", licenseId));
         }
         Organization organization = getOrganizationInfo(organizationId);
         if (organization != null) {
@@ -105,13 +101,15 @@ public class LicenseService {
         return license.withComment(config.getProperty());
     }
 
-    public String deleteLicense(String licenseId) {
-        String responseMessage = null;
+    public String deleteLicense(String organizationId, String licenseId) {
+        String responseMessage;
         License license = new License();
         license.setLicenseId(licenseId);
         licenseRepository.delete(license);
-        responseMessage = String.format(messageSource
-            .getMessage("license.delete.message", null, null), licenseId);
+        String messageTemplate = messageSource
+            .getMessage("license.delete.message", null, LocaleContextHolder.getLocale());
+        responseMessage = String.format(messageTemplate,
+            licenseId, organizationId);
         return responseMessage;
 
     }
