@@ -4,13 +4,16 @@ import com.optimagrowth.organization.events.model.OrganizationChangeModel;
 import com.optimagrowth.organization.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class OrganizationChangePublisher {
+@Qualifier("streamBridge")
+public class StreamBridgePublisher implements Publisher {
     @Autowired
-    private org.springframework.kafka.core.KafkaTemplate<String, OrganizationChangeModel> kafkaTemplate;
+    private StreamBridge streamBridge;
 
     public void publishOrganizationChange(String action, String organizationId) {
         log.debug("Sending Kafka message {} for Organization Id: {}", action, organizationId);
@@ -19,7 +22,6 @@ public class OrganizationChangePublisher {
             action,
             organizationId,
             UserContext.getCorrelationId());
-        kafkaTemplate.send("orgChangeTopic", change);
+        streamBridge.send("orgChangeTopic", change);
     }
 }
-

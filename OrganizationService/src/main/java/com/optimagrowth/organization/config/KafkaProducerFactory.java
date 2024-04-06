@@ -31,7 +31,6 @@ public class KafkaProducerFactory {
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
-
     @Bean
     public KafkaTemplate<String, OrganizationChangeModel> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
