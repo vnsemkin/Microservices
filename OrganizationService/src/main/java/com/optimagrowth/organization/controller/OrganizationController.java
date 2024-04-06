@@ -29,7 +29,7 @@ public class OrganizationController {
     }
     @RolesAllowed("ADMIN")
     @PutMapping("/{organizationId}")
-    public void updateOrganization( @PathVariable("organizationId") String id, @RequestBody Organization organization) {
+    public void updateOrganization(@RequestBody Organization organization) {
         service.update(organization);
     }
     @RolesAllowed("ADMIN")
@@ -40,8 +40,8 @@ public class OrganizationController {
     @RolesAllowed("ADMIN")
     @DeleteMapping("/{organizationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteOrganization( @PathVariable("id") String id,  @RequestBody Organization organization) {
-        service.delete(organization);
+    public void deleteOrganization( @PathVariable("organizationId") String id) {
+        service.delete(id);
     }
 
 }
