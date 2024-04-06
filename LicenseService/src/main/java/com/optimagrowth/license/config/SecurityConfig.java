@@ -1,4 +1,4 @@
-package com.optimagrowth.license.configuration;
+package com.optimagrowth.license.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

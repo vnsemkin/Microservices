@@ -1,6 +1,6 @@
 package com.optimagrowth.license.service;
 
-import com.optimagrowth.license.configuration.ServiceConfig;
+import com.optimagrowth.license.config.ServiceConfig;
 import com.optimagrowth.license.exception.LicenseNotFoundException;
 import com.optimagrowth.license.model.License;
 import com.optimagrowth.license.model.Organization;
