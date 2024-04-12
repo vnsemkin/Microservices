@@ -5,7 +5,7 @@ import com.optimagrowth.license.exception.LicenseNotFoundException;
 import com.optimagrowth.license.model.License;
 import com.optimagrowth.license.model.Organization;
 import com.optimagrowth.license.repository.LicenseRepository;
-import com.optimagrowth.license.service.client.OrganizationServiceClient;
+import com.optimagrowth.license.service.client.OrganizationFeignTemplate;
 import com.optimagrowth.license.service.utils.UserContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ import java.util.concurrent.TimeoutException;
 @Service
 public class LicenseService {
     @Autowired
-    private OrganizationServiceClient organizationServiceClient;
+    private OrganizationFeignTemplate organizationServiceClient;
 
     @Autowired
     private MessageSource messageSource;
@@ -58,7 +58,7 @@ public class LicenseService {
 //	@Retry(name = "retryLicenseService")
 //	@Bulkhead(name = "bulkheadLicenseService", type= Bulkhead.Type.THREADPOOL)
     public List<License> getLicensesByOrganization(String organizationId) throws TimeoutException {
-        log.debug("getLicensesByOrganization Correlation id: {}",
+        log.info("getLicensesByOrganization Correlation id: {}",
             UserContextHolder.getContext().getCorrelationId());
 //        randomlyRunLong();
         List<License> byOrganizationId = licenseRepository.findByOrganizationId(organizationId);

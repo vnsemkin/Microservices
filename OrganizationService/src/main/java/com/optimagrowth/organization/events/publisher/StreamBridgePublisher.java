@@ -16,7 +16,7 @@ public class StreamBridgePublisher implements Publisher {
     private StreamBridge streamBridge;
 
     public void publishOrganizationChange(String action, String organizationId) {
-        log.debug("Sending Kafka message {} for Organization Id: {}", action, organizationId);
+        log.info("Sending Kafka message {} for Organization Id: {}", action, organizationId);
         OrganizationChangeModel change = new OrganizationChangeModel(
             OrganizationChangeModel.class.getTypeName(),
             action,

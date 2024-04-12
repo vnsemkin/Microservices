@@ -24,20 +24,20 @@ public class OrganizationService {
     public Organization findById(String organizationId) {
         Optional<Organization> opt = repository.findById(organizationId);
         publisher.publishOrganizationChange("GET", organizationId);
-        return (opt.isPresent()) ? opt.get() : null;
+        return opt.orElse(null);
     }
 
     public Organization create(Organization organization){
-        organization.setId( UUID.randomUUID().toString());
+        organization.setOrganizationId( UUID.randomUUID().toString());
         organization = repository.save(organization);
-        publisher.publishOrganizationChange("SAVE", organization.getId());
+        publisher.publishOrganizationChange("SAVE", organization.getOrganizationId());
         return organization;
 
     }
 
     public void update(Organization organization){
         repository.save(organization);
-        publisher.publishOrganizationChange("UPDATE", organization.getId());
+        publisher.publishOrganizationChange("UPDATE", organization.getOrganizationId());
     }
 
     public void delete(String organizationId){

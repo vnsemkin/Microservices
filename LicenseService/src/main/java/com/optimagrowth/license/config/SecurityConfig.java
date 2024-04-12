@@ -2,6 +2,7 @@ package com.optimagrowth.license.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -30,6 +31,8 @@ import java.util.stream.Collectors;
 @EnableWebSecurity
 @EnableMethodSecurity(jsr250Enabled = true)
 public class SecurityConfig {
+    @Value("${app.client}")
+    private String client;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -59,8 +62,8 @@ public class SecurityConfig {
             }
             // Extract client-specific roles
             Map<String, Map<String, List<String>>> resourceAccess = jwt.getClaim("resource_access");
-            if (resourceAccess != null && resourceAccess.containsKey("ostock")) {
-                List<String> clientRoles = resourceAccess.get("ostock").get("roles");
+            if (resourceAccess != null && resourceAccess.containsKey(client)) {
+                List<String> clientRoles = resourceAccess.get(client).get("roles");
                 if (clientRoles != null) {
                     authorities.addAll(clientRoles.stream()
                         .map(roleName -> new SimpleGrantedAuthority("ROLE_" + roleName))

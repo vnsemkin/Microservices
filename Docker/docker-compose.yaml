@@ -12,6 +12,8 @@ services:
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/1-init.sql
       - ./data.sql:/docker-entrypoint-initdb.d/2-data.sql
+      - ./keycloak_db.sql:/docker-entrypoint-initdb.d/keycloak_db.sql
+      - postgres_data:/var/lib/postgresql/data
     networks:
       backend:
         aliases:
@@ -21,40 +23,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-  config-server:
-    container_name: config-server
-    build: ../ConfigurationServer/
-    ports:
-      - "8071:8071"
-    networks:
-      backend:
-        aliases:
-          - "config-server"
-  eureka-server:
-    container_name: eureka-server
-    build: ../EurekaServer/
-    environment:
-      PROFILE: "dev"
-      CONFIG_SERVER_URL: "http://config-server"
-      CONFIG_SERVER_PORT: "8071"
-    ports:
-      - "8070:8070"
-    depends_on:
-      database:
-        condition: service_healthy
-      config-server:
-        condition: service_started
-    networks:
-      backend:
-        aliases:
-          - "eureka-server"
   keycloak:
     image: quay.io/keycloak/keycloak:latest
     container_name: keycloak
     restart: no
-    environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
+    env_file:
+      - keycloak_config.env
     volumes:
       - keycloak_data:/opt/jboss/keycloak/standalone/data
       - keycloak_config:/opt/jboss/keycloak/standalone/configuration
@@ -65,47 +39,13 @@ services:
       backend:
         aliases:
           - "keycloak"
-  license-service:
-    container_name: licensing-service
-    build: ../LicenseService/
-    environment:
-      PROFILE: "dev"
-      CONFIG_SERVER_URL: "http://config-server"
-      CONFIG_SERVER_PORT: "8071"
-      DATABASE_SERVER_PORT: "5432"
-    depends_on:
-      database:
-        condition: service_healthy
-      config-server:
-        condition: service_started
-    ports:
-      - "8082:8082"
-    networks:
-      - backend
-  organization-service:
-    container_name: organization-service
-    build: ../OrganizationService/
-    environment:
-      PROFILE: "dev"
-      CONFIG_SERVER_URL: "http://config-server"
-      CONFIG_SERVER_PORT: "8071"
-      DATABASE_SERVER_PORT: "5432"
-    depends_on:
-      database:
-        condition: service_healthy
-      config-server:
-        condition: service_started
-    ports:
-      - "8081:8081"
-    networks:
-      - backend
   zookeeper:
     image: wurstmeister/zookeeper:latest
     container_name: zookeeper
     ports:
       - 2181:2181
     networks:
-        - backend
+      - backend
   kafkaserver:
     image: wurstmeister/kafka:latest
     container_name: kafkaserver
@@ -115,7 +55,7 @@ services:
       - KAFKA_ADVERTISED_HOST_NAME=localhost
       - KAFKA_ADVERTISED_PORT=9092
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-#      - KAFKA_CREATE_TOPICS=dresses:1:1,ratings:1:1,orgChangeTopic:1:1
+    #      - KAFKA_CREATE_TOPICS=dresses:1:1,ratings:1:1,orgChangeTopic:1:1
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
     depends_on:
@@ -129,9 +69,86 @@ services:
       - 6379:6379
     networks:
       - backend
+#  eureka-server:
+#    container_name: eureka-server
+#    build: ../EurekaServer/
+#    environment:
+#      PROFILE: "dev"
+#      CONFIG_SERVER_URL: "http://config-server"
+#      CONFIG_SERVER_PORT: "8071"
+#    ports:
+#      - "8070:8070"
+#    depends_on:
+#      database:
+#        condition: service_healthy
+#      config-server:
+#        condition: service_started
+#    networks:
+#      backend:
+#        aliases:
+#          - "eureka-server"
+#  config-server:
+#    container_name: config-server
+#    build: ../ConfigurationServer/
+#    ports:
+#      - "8071:8071"
+#    networks:
+#      backend:
+#        aliases:
+#          - "config-server"
+#  license-service:
+#    container_name: licensing-service
+#    build: ../LicenseService/
+#    environment:
+#      PROFILE: "dev"
+#      CONFIG_SERVER_URL: "http://config-server"
+#      CONFIG_SERVER_PORT: "8071"
+#      DATABASE_SERVER_PORT: "5432"
+#    depends_on:
+#      database:
+#        condition: service_healthy
+#      config-server:
+#        condition: service_started
+#    ports:
+#      - "8082:8082"
+#    networks:
+#      - backend
+#  organization-service:
+#    container_name: organization-service
+#    build: ../OrganizationService/
+#    environment:
+#      PROFILE: "dev"
+#      CONFIG_SERVER_URL: "http://config-server"
+#      CONFIG_SERVER_PORT: "8071"
+#      DATABASE_SERVER_PORT: "5432"
+#    depends_on:
+#      database:
+#        condition: service_healthy
+#      config-server:
+#        condition: service_started
+#    ports:
+#      - "8081:8081"
+#    networks:
+#      - backend
+#  db:
+#    container_name: mysql
+#    image: mysql
+#    restart: always
+#    ports:
+#      - "3306:3306"
+#    environment:
+#      MYSQL_ROOT_PASSWORD: "mysql"
+#    volumes:
+#      - mysql_data:/var/lib/mysql
+#    networks:
+#      backend:
+#        aliases:
+#          - "mysql"
 volumes:
   keycloak_data:
   keycloak_config:
+  postgres_data:
+  mysql_data:
 networks:
   backend:
     driver: bridge

@@ -13,6 +13,7 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 import java.util.Locale;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @Slf4j
 @Setter
@@ -21,16 +22,18 @@ import java.util.function.Consumer;
 @ConfigurationProperties(prefix = "example")
 public class ServiceConfig {
     private String property;
+
     @Bean
     public LocaleResolver localeResolver() {
         var localeResolver = new SessionLocaleResolver();
         localeResolver.setDefaultLocale(Locale.US);
         return localeResolver;
     }
+
     @Bean
     public ResourceBundleMessageSource messageSource() {
         var messageSource =
-                new ResourceBundleMessageSource();
+            new ResourceBundleMessageSource();
         messageSource.setUseCodeAsDefaultMessage(true);
         messageSource.setBasenames("messages");
         return messageSource;
@@ -38,7 +41,23 @@ public class ServiceConfig {
 
     @Bean
     public Consumer<OrganizationChangeModel> input() {
-      return org -> log.info("Received an {} event for organization id {}",
-          org.getAction(), org.getOrganizationId());
+        return org -> log.info("Received an {} event for organization id {}",
+            org.getAction(), org.getOrganizationId());
+    }
+
+    @Bean
+    public Consumer<OrganizationChangeModel> inboundOrgChanges() {
+        return organization -> {
+            System.out.println("Incoming message");
+            log.info("Received a message of type {}", organization.getType());
+            log.info("Received a message with an event {} from the organization service for the organization id {}",
+                organization.getType(), organization.getOrganizationId());
+        };
+    }
+
+
+    @Bean
+    public Supplier<String> outboundOrgChanges() {
+        return () -> "Outbound org";
     }
 }
