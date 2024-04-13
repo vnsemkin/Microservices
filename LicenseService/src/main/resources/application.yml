@@ -1,6 +1,6 @@
 spring:
   application:
-    name: licensing-service
+    name: license-service
   profiles:
     active: dev
   config:
