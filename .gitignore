@@ -12,3 +12,7 @@
 /OrganizationService/target/
 /LicenseService/licening-service.iml
 /OrganizationService/organization-service.iml
+/Docker/logs/
+/Docker/config_server.env
+/GatewayServer/HELP.md
+/GatewayServer/target/

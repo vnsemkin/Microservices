@@ -1,9 +1,0 @@
-spring:
-  application:
-    name: organization-service
-  profiles:
-    active: dev
-  config:
-    import: "optional:configserver:${CONFIG_SERVER_URL}:${CONFIG_SERVER_PORT}"
-
-

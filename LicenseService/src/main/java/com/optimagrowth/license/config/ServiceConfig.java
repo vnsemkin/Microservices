@@ -48,7 +48,6 @@ public class ServiceConfig {
     @Bean
     public Consumer<OrganizationChangeModel> inboundOrgChanges() {
         return organization -> {
-            System.out.println("Incoming message");
             log.info("Received a message of type {}", organization.getType());
             log.info("Received a message with an event {} from the organization service for the organization id {}",
                 organization.getType(), organization.getOrganizationId());

@@ -8,9 +8,15 @@
         </encoder>
     </appender>
 
+    <appender name="CONSOLE_MICRO" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date %level [%thread] %logger{10} [%mdc{traceId},%mdc{spanId}] %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <!-- File Appender for Debug level -->
     <appender name="FILE_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/info.log</file>
+        <file>./logs/info.log</file>
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
@@ -22,12 +28,15 @@
 
     <!-- Root Logger -->
     <root level="INFO">
-        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="CONSOLE"/>
     </root>
 
     <!-- Logger for com.optimagrowth.organization -->
     <logger name="com.optimagrowth.organization" level="INFO">
-        <appender-ref ref="FILE_INFO" />
+        <appender-ref ref="FILE_INFO"/>
     </logger>
 
+    <logger name="io" level="DEBUG">
+        <appender-ref ref="CONSOLE_MICRO"/>
+    </logger>
 </configuration>

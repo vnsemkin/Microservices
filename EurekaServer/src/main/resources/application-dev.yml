@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: eureka-server
+  config:
+    import: "optional:configserver:http://localhost:8071"
+
+server:
+  port: 8070
+
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 30
+    leaseExpirationDurationInSeconds: 90
+  server:
+    renewalPercentThreshold: 0.85

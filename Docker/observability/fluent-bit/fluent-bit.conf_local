@@ -1,0 +1,16 @@
+[INPUT]
+    Name             tail
+    Path             /var/log/mylogs/info.log
+    Path_Key         filename
+    Tag              newapp
+    Read_from_Head   true
+[Output]
+    Name grafana-loki
+    Match *
+    Url ${LOKI_URL}
+    Labels      {job="newapp"}
+    LabelKeys   filename
+    BatchWait 1s
+    BatchSize 1001024
+    LineFormat json
+    LogLevel info

@@ -1,0 +1,2 @@
+2024-04-22 14:57:56 [main] INFO  c.o.l.LicenseServiceApplicationTests - Starting LicenseServiceApplicationTests using Java 21.0.2 with PID 83912 (started by normat in /mnt/c/Users/vnsem/OneDrive/dev/Microservices/LicenseService)
+2024-04-22 14:57:56 [main] INFO  c.o.l.LicenseServiceApplicationTests - The following 1 profile is active: "dev"
