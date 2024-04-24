@@ -6,7 +6,10 @@ spring:
   cloud:
     config:
       server:
-        native:
-            search-locations: classpath:/config
+        git:
+          uri: git@github.com:vnsemkin/Microservices.git
+          search-paths: config
+      #        native:
+      #            search-locations: classpath:/config
 server:
   port: 8071
