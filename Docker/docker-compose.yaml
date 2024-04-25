@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.9'
 services:
   database:
     container_name: database
@@ -8,11 +8,9 @@ services:
     environment:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "postgres"
-      POSTGRES_DB: "ostock_dev"
+      POSTGRES_DB: "postgres"
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/1-init.sql
-      - ./data.sql:/docker-entrypoint-initdb.d/2-data.sql
-      - ./keycloak_db.sql:/docker-entrypoint-initdb.d/keycloak_db.sql
+      - ../config/db_scripts:/docker-entrypoint-initdb.d
       - postgres_data:/var/lib/postgresql/data
     networks:
       backend:
@@ -39,6 +37,21 @@ services:
       backend:
         aliases:
           - "keycloak"
+  vault:
+    image: hashicorp/vault:latest
+    container_name: vault
+    ports:
+      - "8200:8200"
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ../config/vault:/vault/config/
+      - vault_data:/vault/data
+    command: server
+    networks:
+      backend:
+        aliases:
+          - "vault"
   zookeeper:
     image: wurstmeister/zookeeper:latest
     container_name: zookeeper
@@ -55,7 +68,6 @@ services:
       - KAFKA_ADVERTISED_HOST_NAME=kafka-server
       - KAFKA_ADVERTISED_PORT=9092
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-    #      - KAFKA_CREATE_TOPICS=dresses:1:1,ratings:1:1,orgChangeTopic:1:1
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
     depends_on:
@@ -94,9 +106,9 @@ services:
       - GF_SECURITY_ADMIN_USER=user
       - GF_SECURITY_ADMIN_PASSWORD=password
     volumes:
-      - ./observability/grafana/datasources/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
-      - ./observability/grafana/dashboards:/etc/grafana/provisioning/dashboards
-      - ./observability/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ../config/observability/grafana/datasources/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+      - ../config/observability/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ../config/observability/grafana/grafana.ini:/etc/grafana/grafana.ini
     networks:
       backend:
         aliases:
@@ -247,6 +259,8 @@ volumes:
   keycloak_config:
   postgres_data:
   mysql_data:
+  vault_data:
+    driver: local
 networks:
   backend:
     driver: bridge

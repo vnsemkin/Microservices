@@ -1,15 +1,18 @@
 spring:
-  application:
-    name: config-server
-  profiles:
-    active: native
+  application.name: config-server
+  profiles.active: vault, git
   cloud:
-    config:
-      server:
+    config.server:
+        vault:
+          kv-version: 2
+          authentication: TOKEN
+          token: ${VAULT_TOKEN}
+          order: 1
+          profile-separator: "-"
         git:
           uri: git@github.com:vnsemkin/Microservices.git
-          search-paths: config
-      #        native:
-      #            search-locations: classpath:/config
-server:
-  port: 8071
+          search-paths: config/microservices
+          default-label: master
+          order: 2
+server.port: 8071
+
