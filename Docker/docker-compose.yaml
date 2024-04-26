@@ -40,12 +40,14 @@ services:
   vault:
     image: hashicorp/vault:latest
     container_name: vault
+    environment:
+      - VAULT_ADDR=http://127.0.0.1:8200
     ports:
       - "8200:8200"
     cap_add:
       - IPC_LOCK
     volumes:
-      - ../config/vault:/vault/config/
+      - ../config/vault/vault:/vault/config/
       - vault_data:/vault/data
     command: server
     networks:
@@ -133,7 +135,7 @@ services:
     environment:
       - LOKI_URL=http://loki:3100/loki/api/v1/push
     volumes:
-      - ./observability/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - ../config/observability/fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
     networks:
       backend:
         aliases:
@@ -141,6 +143,10 @@ services:
   config-server:
     container_name: config-server
     build: ../ConfigurationServer/
+    env_file:
+      - ../config/env/config-server.env
+    volumes:
+      - ../config/.ssh/:/root/.ssh
     ports:
       - "8071:8071"
     depends_on:
@@ -259,6 +265,8 @@ volumes:
   keycloak_config:
   postgres_data:
   mysql_data:
+  vault_transit_data:
+    driver: local
   vault_data:
     driver: local
 networks:

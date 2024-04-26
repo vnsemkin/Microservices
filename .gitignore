@@ -16,3 +16,8 @@
 /Docker/config_server.env
 /GatewayServer/HELP.md
 /GatewayServer/target/
+/config/env/env_vars_microservice.txt
+/config/.ssh/
+/config/env/
+/config/db_scripts/
+/config/vault/

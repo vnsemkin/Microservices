@@ -4,6 +4,7 @@ spring:
   cloud:
     config.server:
         vault:
+          host: vault
           kv-version: 2
           authentication: TOKEN
           token: ${VAULT_TOKEN}
@@ -15,4 +16,5 @@ spring:
           default-label: master
           order: 2
 server.port: 8071
-
+# Application props
+app.vault.url: vault:8200
