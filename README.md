@@ -32,8 +32,10 @@ The 'Project Microservices' template is crafted to streamline the development pr
 This template leverages a wide range of technologies and tools, including:
 
 - Spring Boot
+- Spring Security
 - Spring Cloud Config
 - Eureka Service Discovery
+- Vault
 - Zuul/ Spring Cloud Gateway
 - Hystrix/ Resilience4j
 - Docker and Kubernetes for containerization and orchestration
@@ -45,4 +47,5 @@ This template leverages a wide range of technologies and tools, including:
 - Java JDK 11 or newer
 - Maven
 - Docker
+- Docker-compose
 - Kubernetes (optional for deployment)
