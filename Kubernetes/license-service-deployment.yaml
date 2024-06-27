@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: license-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: license-service
+  template:
+    metadata:
+      labels:
+        app: license-service
+    spec:
+      containers:
+        - name: license-service
+          image: your-license-service-image
+          ports:
+            - containerPort: 8082
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: prod
+            - name: CONFIG_SERVER_URL
+              value: http://config-server
+            - name: CONFIG_SERVER_PORT
+              value: "8071"
+      volumes:
+        - name: fluentd-socket
+          hostPath:
+            path: /var/run/fluentd.sock
+      volumeMounts:
+        - name: fluentd-socket
+          mountPath: /var/run/fluentd.sock
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: license-service
+spec:
+  ports:
+    - port: 8082
+      targetPort: 8082
+  selector:
+    app: license-service

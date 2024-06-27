@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fluent-bit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fluent-bit
+  template:
+    metadata:
+      labels:
+        app: fluent-bit
+    spec:
+      containers:
+        - name: fluent-bit
+          image: grafana/fluent-bit-plugin-loki:2.9.1
+          ports:
+            - containerPort: 24224
+          env:
+            - name: LOKI_URL
+              value: http://loki:3100/loki/api/v1/push
+          volumeMounts:
+            - name: fluent-bit-config
+              mountPath: /fluent-bit/etc/fluent-bit.conf
+      volumes:
+        - name: fluent-bit-config
+          configMap:
+            name: fluent-bit-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluent-bit-config
+data:
+  fluent-bit.conf: |
+    # Your fluent-bit configuration here
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fluent-bit
+spec:
+  ports:
+    - port: 24224
+      targetPort: 24224
+  selector:
+    app: fluent-bit

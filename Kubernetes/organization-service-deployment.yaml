@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: organization-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: organization-service
+  template:
+    metadata:
+      labels:
+        app: organization-service
+    spec:
+      containers:
+        - name: organization-service
+          image: your-organization-service-image
+          ports:
+            - containerPort: 8081
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: prod
+            - name: CONFIG_SERVER_URL
+              value: http://config-server
+            - name: CONFIG_SERVER_PORT
+              value: "8071"
+            - name: DATABASE_SERVER_PORT
+              value: "5432"
+      volumes:
+        - name: fluentd-socket
+          hostPath:
+            path: /var/run/fluentd.sock
+      volumeMounts:
+        - name: fluentd-socket
+          mountPath: /var/run/fluentd.sock
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: organization-service
+spec:
+  ports:
+    - port: 8081
+      targetPort: 8081
+  selector:
+    app: organization-service

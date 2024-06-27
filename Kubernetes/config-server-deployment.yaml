@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: config-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: config-server
+  template:
+    metadata:
+      labels:
+        app: config-server
+    spec:
+      containers:
+        - name: config-server
+          image: your-config-server-image
+          ports:
+            - containerPort: 8071
+          envFrom:
+            - configMapRef:
+                name: config-server-env
+          volumeMounts:
+            - name: ssh-keys
+              mountPath: /root/.ssh
+      volumes:
+        - name: ssh-keys
+          secret:
+            secretName: ssh-keys-secret
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-server-env
+data:
+# Your environment variables here
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ssh-keys-secret
+data:
+# Your SSH keys here, base64 encoded
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: config-server
+spec:
+  ports:
+    - port: 8071
+      targetPort: 8071
+  selector:
+    app: config-server
